@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { BackgroundWrapper } from "../components/backgroundWrapper";
-import { blue, lightBlue, lightPurple, purple } from "../utils/constants";
+import { lightBlue, lightPurple } from "../utils/constants";
 import { useNavigation } from "@react-navigation/native";
 import { PrimaryButton } from "../components/primaryButton";
 

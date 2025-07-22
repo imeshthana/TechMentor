@@ -5,6 +5,7 @@ import { SplashScreen } from "../screens/splashScreen";
 import { StudentRegisterScreen, StudentRegisterScreenStepOne } from "../screens/studentScreens/registerScreenStepOne";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StudentRegisterScreenStepTwo } from "../screens/studentScreens/registerScreenStepTwo";
+import { StudentBottomTabNavigator } from "./studentBottomTabNavigator";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,6 +31,11 @@ export const AppNavigator = () => {
         name="InstructorRegister"
         component={InstructorRegisterScreen}
       />
+      <Stack.Screen
+        name="StudentBottomTab"
+        component={StudentBottomTabNavigator}
+      />
+      
     </Stack.Navigator>
   );
 };

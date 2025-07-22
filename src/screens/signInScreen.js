@@ -12,7 +12,7 @@ export const SignInScreen = () => {
   const navigation = useNavigation();
 
   const handleSignIn = () => {
-    console.log("Signing in with:", username, password);
+    navigation.navigate("StudentBottomTab");
   };
 
   const goToRegister = () => {
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   registerText: {
-    marginTop:10,
+    marginTop: 10,
     fontSize: 14,
     color: "#555",
   },

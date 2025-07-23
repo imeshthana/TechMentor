@@ -38,7 +38,7 @@ export const SingleCourseScreen = () => {
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>{course.title}</Text>
-        <Text style={styles.instructor}>Instructor: {course.instructor}</Text>
+        <Text style={styles.instructor}>Instructor: {course.instructor_name}</Text>
         <Text style={styles.description}>{course.description}</Text>
 
         {course.content && (
@@ -81,11 +81,12 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#444",
+    marginBottom: 20
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
-    marginBottom: 10,
+    marginBottom: 5,
     color: "#6a11cb",
   },
   contentItem: {

@@ -19,7 +19,7 @@ export const PrimaryButton = ({
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 10,
     marginVertical: 8,
     alignItems: "center",

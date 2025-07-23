@@ -13,13 +13,48 @@ export const RegisterScreenStepOne = ({ route, navigation }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const validateFields = () => {
+    const newErrors = {
+      username: "",
+      password: "",
+      confirmPassword: "",
+    };
+
+    if (!username.trim()) {
+      newErrors.username = "Username is required";
+    }
+
+    if (!password) {
+      newErrors.password = "Password is required";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    }
+
+    if (password && confirmPassword && password !== confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+
+    return !Object.values(newErrors).some((error) => error !== "");
+  };
+
   const goToStepTwo = () => {
-    navigation.navigate("RegisterStepTwo", {
-      username,
-      password,
-      confirmPassword,
-      role,
-    });
+    if (validateFields()) {
+      navigation.navigate("RegisterStepTwo", {
+        username,
+        password,
+        role,
+      });
+    }
   };
 
   const goToSignin = () => {
@@ -38,23 +73,43 @@ export const RegisterScreenStepOne = ({ route, navigation }) => {
         <Text style={styles.title}>Register as {role}</Text>
         <Text style={styles.subtitle}>Step 1</Text>
 
-        <InputField
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <InputField
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <InputField
-          placeholder="Confirm Password"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
+        <View style={styles.inputContainer}>
+          <InputField
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+            hasError={!!errors.username}
+          />
+          {errors.username ? (
+            <Text style={styles.errorText}>{errors.username}</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.inputContainer}>
+          <InputField
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+            hasError={!!errors.password}
+          />
+          {errors.password ? (
+            <Text style={styles.errorText}>{errors.password}</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.inputContainer}>
+          <InputField
+            placeholder="Confirm Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            hasError={!!errors.confirmPassword}
+          />
+          {errors.confirmPassword ? (
+            <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+          ) : null}
+        </View>
 
         <PrimaryButton
           title="Next"
@@ -88,13 +143,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#333",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
     marginBottom: 5,
     textAlign: "center",
     color: "#333",
@@ -104,6 +152,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     color: "#666",
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 5,
+  },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 12,
+    marginBottom: 10,
+    marginLeft: 5,
   },
   registerText: {
     marginTop: 10,

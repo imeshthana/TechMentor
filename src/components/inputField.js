@@ -6,10 +6,12 @@ export const InputField = ({
   value,
   onChangeText,
   secureTextEntry = false,
+  hasError = false,
 }) => {
   return (
     <TextInput
-      style={styles.input}
+      autoCapitalize="none"
+      style={[styles.input, hasError && styles.inputError]}
       placeholder={placeholder}
       placeholderTextColor="#aaa"
       value={value}
@@ -27,8 +29,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 15,
+    marginBottom: 5,
     color: "#000",
     backgroundColor: "#fff",
+  },
+  inputError: {
+    borderColor: "#ff4444",
+    borderWidth: 2,
   },
 });

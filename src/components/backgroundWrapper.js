@@ -24,8 +24,9 @@ export const BackgroundWrapper = ({ children }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     position: "relative",
+    zIndex: 0,
   },
   content: {
     flex: 1,
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     right: "-5%",
     width: 250,
     height: 250,
-    zIndex: 0,
+    zIndex: 1,
   },
   bottomLeftGlow: {
     position: "absolute",
@@ -45,6 +46,6 @@ const styles = StyleSheet.create({
     left: "-35%",
     width: 350,
     height: 350,
-    zIndex: 0,
+    zIndex: 1,
   },
 });

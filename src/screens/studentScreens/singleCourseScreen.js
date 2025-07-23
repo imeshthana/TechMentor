@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
   instructor: {
     fontSize: 16,
     color: "#555",
+    marginTop: 20,
     marginBottom: 12,
   },
   description: {
     fontSize: 16,
     color: "#444",
-    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,

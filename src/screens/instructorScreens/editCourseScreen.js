@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { InputField } from "../../components/inputField";
 import { PrimaryButton } from "../../components/primaryButton";
@@ -13,12 +14,19 @@ import { Title } from "../../components/title";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { purple } from "../../utils/constants";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { blue, purple } from "../../utils/constants";
 
-export const AddCourseScreen = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [courseContentList, setCourseContentList] = useState([""]);
+export const EditCourseScreen = () => {
+  const { params } = useRoute();
+  const navigation = useNavigation();
+  const { course } = params;
+
+  const [title, setTitle] = useState(course.title);
+  const [description, setDescription] = useState(course.description);
+  const [courseContentList, setCourseContentList] = useState(
+    course.content || []
+  );
 
   const handleAddBlock = () => {
     setCourseContentList([...courseContentList, ""]);
@@ -40,19 +48,38 @@ export const AddCourseScreen = () => {
     const filteredContent = courseContentList.filter(
       (item) => item.trim() !== ""
     );
-    const courseData = {
+    const updatedCourse = {
       title,
       description,
       content: filteredContent,
     };
-    console.log("Course Submitted:", courseData);
+    console.log("Updated Course:", updatedCourse);
+    navigation.goBack(); 
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Course",
+      "Are you sure you want to delete this course?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            console.log("Course Deleted:", course.id);
+            navigation.goBack(); 
+          },
+        },
+      ]
+    );
   };
 
   return (
     <BackgroundWrapper>
       <SafeAreaView>
         <ScrollView contentContainerStyle={styles.container}>
-          <Title title="Add New Course" />
+          <Title title="Edit Course" />
 
           <View style={styles.formContainer}>
             <InputField
@@ -96,7 +123,12 @@ export const AddCourseScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <PrimaryButton title="Submit Course" onPress={handleSubmit} />
+          <PrimaryButton
+            title="Delete Course"
+            onPress={handleDelete}
+            backgroundColor={blue}
+          />
+          <PrimaryButton title="Submit Changes" onPress={handleSubmit} />
         </ScrollView>
       </SafeAreaView>
     </BackgroundWrapper>

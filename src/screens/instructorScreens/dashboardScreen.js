@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { StudentCourseCard } from "../../components/studentCourseCard";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { InstructorCourseCard } from "../../components/instructorCourseCard";
 import { Title } from "../../components/title";
 
 const courses = [
@@ -11,28 +11,44 @@ const courses = [
     id: "1",
     title: "Introduction to Programming",
     description: "Learn the basics of programming using Python.",
-    instructor: "John Doe",
+    count: 2,
+    contents: [
+      "dewdew", 'ewxwe'
+    ],
+    students: [
+      { id: "stu001", name: "Alice" },
+      { id: "stu002", name: "Bob" },
+    ],
   },
   {
     id: "2",
     title: "Advanced Web Development",
     description: "Master frontend and backend development with modern tools.",
-    instructor: "Jane Smith",
+    count: 2,
+    students: [
+      { id: "stu001", name: "Alice" },
+      { id: "stu002", name: "Bob" },
+    ],
   },
   {
     id: "3",
     title: "Data Structures & Algorithms",
     description: "Boost your problem-solving skills with DSA concepts.",
-    instructor: "Emily Johnson",
+    count: 2,
+    students: [
+      { id: "stu001", name: "Alice" },
+      { id: "stu002", name: "Bob" },
+    ],
   },
 ];
 
-export const StudentDashBoardScreen = () => {
+export const InstructorDashboardScreen = () => {
   const navigation = useNavigation();
 
   const handlePress = (course) => {
     navigation.navigate("SingleCourse", { course });
   };
+
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
@@ -41,10 +57,10 @@ export const StudentDashBoardScreen = () => {
           data={courses}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <StudentCourseCard
+            <InstructorCourseCard
               title={item.title}
               description={item.description}
-              instructor={item.instructor}
+              count={item.count}
               onPress={() => handlePress(item)}
             />
           )}
@@ -64,6 +80,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 16,
-    paddingTop: 20,
+    paddingTop: 20
   },
 });

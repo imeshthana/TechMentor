@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
-import { InputField } from "../../components/inputField";
-import { PrimaryButton } from "../../components/primaryButton";
-import { BackgroundWrapper } from "../../components/backgroundWrapper";
-import { blue, purple } from "../../utils/constants";
+import { InputField } from "../components/inputField";
+import { PrimaryButton } from "../components/primaryButton";
+import { BackgroundWrapper } from "../components/backgroundWrapper";
+import { blue, purple } from "../utils/constants";
 import { useRoute } from "@react-navigation/native";
 
-export const StudentRegisterScreenStepTwo = () => {
+export const RegisterScreenStepTwo = () => {
   const route = useRoute();
-  const { username, password, confirmPassword } = route.params;
+  const { username, password, confirmPassword, role } = route.params;
 
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
 
   const handleFinalRegister = () => {
-    console.log("Final Student Registration Data:", {
+    console.log("Registration Data:", {
       username,
       password,
       confirmPassword,
@@ -23,18 +23,18 @@ export const StudentRegisterScreenStepTwo = () => {
       phoneNumber,
       email,
     });
-    // TODO: Final submission logic
   };
 
   return (
     <BackgroundWrapper>
       <View style={styles.container}>
         <Image
-          source={require("../../assets/logo_bg.png")}
+          source={require("../assets/logo_bg.png")}
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Student Registration - Step 2</Text>
+        <Text style={styles.title}>Register as {role}</Text>
+        <Text style={styles.subtitle}>Step 2</Text>
 
         <InputField
           placeholder="Full Name"
@@ -73,9 +73,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 5,
     textAlign: "center",
     color: "#333",
+  },
+  subtitle: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#666",
   },
   registerText: {
     marginTop: 10,

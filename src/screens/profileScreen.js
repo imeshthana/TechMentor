@@ -1,8 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
-import { PrimaryButton } from "../../components/primaryButton";
-import { BackgroundWrapper } from "../../components/backgroundWrapper";
+import { PrimaryButton } from "../components/primaryButton";
+import { BackgroundWrapper } from "../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Title } from "../components/title";
 
 export const ProfileScreen = () => {
   const user = {
@@ -19,10 +20,9 @@ export const ProfileScreen = () => {
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.heading}>My Profile</Text>
-
+        <Title title={"Profile"} />
         <Image
-          source={require("../../assets/profile.png")}
+          source={require("../assets/profile.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -64,13 +64,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 30,
-    alignSelf: "center"
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
+    marginTop: 20,
+    alignSelf: "center",
   },
   detailContainer: {
     marginBottom: 16,

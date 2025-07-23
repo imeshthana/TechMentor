@@ -1,10 +1,10 @@
-import { InstructorRegisterScreen } from "../screens/instructorScreens/registerScreen";
 import { LandingScreen } from "../screens/landingScreen";
 import { SignInScreen } from "../screens/signInScreen";
 import { SplashScreen } from "../screens/splashScreen";
-import { StudentRegisterScreen, StudentRegisterScreenStepOne } from "../screens/studentScreens/registerScreenStepOne";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StudentRegisterScreenStepTwo } from "../screens/studentScreens/registerScreenStepTwo";
+import { InstructorBottomTabNavigator } from "./instructorBottomTabNavigator";
+import { RegisterScreenStepOne } from "../screens/registerScreenStepOne";
+import { RegisterScreenStepTwo } from "../screens/registerScreenStepTwo";
 import { StudentBottomTabNavigator } from "./studentBottomTabNavigator";
 
 const Stack = createNativeStackNavigator();
@@ -18,24 +18,12 @@ export const AppNavigator = () => {
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Landing" component={LandingScreen} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
-      <Stack.Screen
-        name="StudentRegisterStepOne"
-        component={StudentRegisterScreenStepOne}
-      />
-      <Stack.Screen
-        name="StudentRegisterStepTwo"
-        component={StudentRegisterScreenStepTwo}
-      />
-
-      <Stack.Screen
-        name="InstructorRegister"
-        component={InstructorRegisterScreen}
-      />
+      <Stack.Screen name="RegisterStepOne" component={RegisterScreenStepOne} />
+      <Stack.Screen name="RegisterStepTwo" component={RegisterScreenStepTwo} />
       <Stack.Screen
         name="StudentBottomTab"
         component={StudentBottomTabNavigator}
       />
-      
     </Stack.Navigator>
   );
 };

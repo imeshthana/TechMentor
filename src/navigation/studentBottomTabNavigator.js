@@ -1,10 +1,8 @@
 import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { purple, lightPurple, blue } from "../utils/constants";
-import { CoursesScreen } from "../screens/studentScreens/coursesScreen";
-import { DashBoardScreen } from "../screens/studentScreens/dashBoardScreen";
 import { AIBotScreen } from "../screens/studentScreens/aiBotScreen";
-import { ProfileScreen } from "../screens/studentScreens/profileScreen";
+import { ProfileScreen } from "../screens/profileScreen";
 import { CourseNavigator } from "./courseNavigator";
 import { DashboardNavigator } from "./dashBoardNavigator";
 

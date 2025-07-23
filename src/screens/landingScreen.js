@@ -13,11 +13,11 @@ export const LandingScreen = () => {
   };
 
   const navigateInstructorRegister = () => {
-    navigation.navigate("InstructorRegister");
+    navigation.navigate("RegisterStepOne", { role: "instructor" });
   };
 
   const navigateStudentRegister = () => {
-    navigation.navigate("StudentRegisterStepOne");
+    navigation.navigate("RegisterStepOne", { role: "student" });
   };
 
   return (

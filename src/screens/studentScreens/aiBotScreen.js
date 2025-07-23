@@ -13,6 +13,7 @@ import {
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { lightBlue, lightPurple, purple } from "../../utils/constants";
+import { Title } from "../../components/title";
 
 export const AIBotScreen = () => {
   const [messages, setMessages] = useState([
@@ -64,7 +65,7 @@ export const AIBotScreen = () => {
           behavior= "height"
           keyboardVerticalOffset= {10}
         >
-          <Text style={styles.title}>AI Assistant</Text>
+          <Title title={"AI Assistant"}/>
 
           <Image
             source={require("../../assets/logo_bg.png")}
@@ -106,12 +107,6 @@ const styles = StyleSheet.create({
   keyboardAvoidingView: {
     flex: 1,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
-  },
   messagesList: {
     flex: 1,
   },
@@ -149,6 +144,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 45,
     marginRight: 10,
+    borderColor: purple,
+    borderWidth: 1
   },
   sendButton: {
     backgroundColor: purple,

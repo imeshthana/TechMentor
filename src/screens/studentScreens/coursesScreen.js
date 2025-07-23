@@ -1,9 +1,10 @@
 import React from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import { CourseCard } from "../../components/courseCard";
+import { StudentCourseCard } from "../../components/studentCourseCard";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { Title } from "../../components/title";
 
 const courses = [
   {
@@ -54,12 +55,12 @@ export const CoursesScreen = () => {
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Courses</Text>
+        <Title title={"Courses"} />
         <FlatList
           data={courses}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <CourseCard
+            <StudentCourseCard
               title={item.title}
               description={item.description}
               instructor={item.instructor}
@@ -80,13 +81,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flex: 1,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-    color: "#333",
-  },
   listContent: {
     paddingBottom: 16,
+    paddingTop: 20,
   },
 });

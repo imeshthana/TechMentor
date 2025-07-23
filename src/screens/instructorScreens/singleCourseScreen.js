@@ -9,7 +9,7 @@ import { purple } from "../../utils/constants";
 
 export const SingleCourseScreen = () => {
   const route = useRoute();
-  const { course } = route.params;
+  const { course, enrolledStudents } = route.params;
   const navigation = useNavigation();
   const parentNavigation = navigation.getParent();
 
@@ -43,16 +43,17 @@ export const SingleCourseScreen = () => {
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>{course.title}</Text>
+        <Text style={styles.sectionTitle}>Description</Text>
         <Text style={styles.description}>{course.description}</Text>
 
-        {course.students && course.students.length > 0 && (
+        {enrolledStudents && enrolledStudents.length > 0 && (
           <View style={styles.tableContainer}>
             <Text style={styles.sectionTitle}>Enrolled Students</Text>
             <View style={styles.tableHeader}>
               <Text style={[styles.cell, styles.headerCell]}>ID</Text>
               <Text style={[styles.cell, styles.headerCell]}>Name</Text>
             </View>
-            {course.students.map((student) => (
+            {enrolledStudents.map((student) => (
               <View key={student.id} style={styles.tableRow}>
                 <Text style={styles.cell}>{student.id}</Text>
                 <Text style={styles.cell}>{student.name}</Text>
@@ -60,7 +61,10 @@ export const SingleCourseScreen = () => {
             ))}
           </View>
         )}
-        <TouchableOpacity style={styles.fab} onPress={gotoEditCourse}>
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => gotoEditCourse(course)}
+        >
           <Ionicons name="create-outline" size={28} color="#fff" />
         </TouchableOpacity>
       </SafeAreaView>
@@ -77,7 +81,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 20,
     color: "#333",
   },
   instructor: {
@@ -88,12 +92,12 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#444",
-    marginTop: 20,
+    marginBottom: 10
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 20,
+    marginBottom: 15,
     color: purple,
   },
   tableContainer: {

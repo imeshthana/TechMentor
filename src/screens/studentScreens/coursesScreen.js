@@ -33,7 +33,6 @@ export const CoursesScreen = () => {
   };
 
   const { data, isLoading, isError } = useFetchCourses(
-    courseData,
     handleSuccess,
     handleError
   );
@@ -48,19 +47,19 @@ export const CoursesScreen = () => {
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Title title={"Courses"} />
-        {isLoading ? (
+        {isLoading || !courseData ? (
           <View style={styles.centeredContainer}>
             <ActivityIndicator size="large" color={purple} />
           </View>
         ) : (
           <FlatList
             data={courseData}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item?.id}
             renderItem={({ item }) => (
               <StudentCourseCard
-                title={item.title}
-                description={item.description}
-                instructor={item.instructor_name}
+                title={item?.title}
+                description={item?.description}
+                instructor={item?.instructor_name}
                 onPress={() => handlePress(item)}
               />
             )}

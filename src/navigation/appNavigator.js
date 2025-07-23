@@ -1,26 +1,24 @@
+import React, { useContext, useEffect } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
 import { LandingScreen } from "../screens/landingScreen";
 import { SignInScreen } from "../screens/signInScreen";
 import { SplashScreen } from "../screens/splashScreen";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { InstructorBottomTabNavigator } from "./instructorBottomTabNavigator";
 import { RegisterScreenStepOne } from "../screens/registerScreenStepOne";
 import { RegisterScreenStepTwo } from "../screens/registerScreenStepTwo";
 import { StudentBottomTabNavigator } from "./studentBottomTabNavigator";
-import { useContext } from "react";
 import { AuthContext } from "../contexts/authContext";
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export const AppNavigator = () => {
-  const { isAuthenticated, authData } = useContext(AuthContext);
+  const { authData, loading, isAuthenticated, logout } =
+    useContext(AuthContext);
 
   return (
-    <Stack.Navigator
-      initialRouteName="Splash"
-      screenOptions={{ headerShown: false }}
-    >
-      {isAuthenticated ? (
-        authData.userRole == "student" ? (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated && authData ? (
+        authData.userRole === "student" ? (
           <Stack.Screen
             name="StudentBottomTab"
             component={StudentBottomTabNavigator}
@@ -33,8 +31,8 @@ export const AppNavigator = () => {
         )
       ) : (
         <>
-          <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Landing" component={LandingScreen} />
+          <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen
             name="RegisterStepOne"

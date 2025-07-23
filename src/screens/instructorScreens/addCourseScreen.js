@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { InputField } from "../../components/inputField";
 import { PrimaryButton } from "../../components/primaryButton";
@@ -14,15 +16,66 @@ import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { purple } from "../../utils/constants";
+import { useAddCourse } from "../../hooks/useCourseApi";
+import { AuthContext } from "../../contexts/authContext";
 
 export const AddCourseScreen = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [courseContentList, setCourseContentList] = useState([""]);
+  const { authData } = useContext(AuthContext);
+  const [errors, setErrors] = useState({
+    title: "",
+    description: "",
+    content: "",
+  });
 
-  const handleAddBlock = () => {
-    setCourseContentList([...courseContentList, ""]);
+  const validateFields = () => {
+    const newErrors = {
+      title: "",
+      description: "",
+      content: "",
+    };
+
+    if (!title.trim()) newErrors.title = "Course title is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (courseContentList.every((item) => item.trim() === ""))
+      newErrors.content = "At least one content block is required";
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error !== "");
   };
+
+  const handleSuccess = () => {
+    Alert.alert("Success", "Course has been added successfully");
+    setTitle("");
+    setDescription("");
+    setCourseContentList([""]);
+    setErrors({ title: "", description: "", content: "" });
+  };
+
+  const handleError = () => {
+    Alert.alert("Error", "Failed to submit course. Please try again.");
+  };
+
+  const { mutate, status } = useAddCourse(handleSuccess, handleError);
+
+  const handleSubmit = () => {
+    if (validateFields()) {
+      const filteredContent = courseContentList.filter(
+        (item) => item.trim() !== ""
+      );
+      mutate({
+        title,
+        description,
+        instructor_id: authData?.userId,
+        instructor_name: 'haritha',
+        content: filteredContent,
+      });
+    }
+  };
+
+  const handleAddBlock = () => setCourseContentList([...courseContentList, ""]);
 
   const handleRemoveBlock = (index) => {
     const newList = [...courseContentList];
@@ -36,18 +89,6 @@ export const AddCourseScreen = () => {
     setCourseContentList(newList);
   };
 
-  const handleSubmit = () => {
-    const filteredContent = courseContentList.filter(
-      (item) => item.trim() !== ""
-    );
-    const courseData = {
-      title,
-      description,
-      content: filteredContent,
-    };
-    console.log("Course Submitted:", courseData);
-  };
-
   return (
     <BackgroundWrapper>
       <SafeAreaView>
@@ -59,15 +100,26 @@ export const AddCourseScreen = () => {
               placeholder="Course Title"
               value={title}
               onChangeText={setTitle}
+              hasError={!!errors.title}
             />
+            {errors.title ? (
+              <Text style={styles.errorText}>{errors.title}</Text>
+            ) : null}
 
             <InputField
               placeholder="Course Description"
               value={description}
               onChangeText={setDescription}
+              hasError={!!errors.description}
             />
+            {errors.description ? (
+              <Text style={styles.errorText}>{errors.description}</Text>
+            ) : null}
 
             <Text style={styles.subHeading}>Course Content</Text>
+            {errors.content ? (
+              <Text style={styles.errorText}>{errors.content}</Text>
+            ) : null}
 
             {courseContentList.map((content, index) => (
               <View key={index} style={styles.contentBlock}>
@@ -96,7 +148,11 @@ export const AddCourseScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <PrimaryButton title="Submit Course" onPress={handleSubmit} />
+          {status === "loading" ? (
+            <ActivityIndicator size="large" color={purple} />
+          ) : (
+            <PrimaryButton title="Submit Course" onPress={handleSubmit} />
+          )}
         </ScrollView>
       </SafeAreaView>
     </BackgroundWrapper>
@@ -126,6 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 10,
+    marginTop: 10,
     color: "#444",
   },
   contentBlock: {
@@ -147,5 +204,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: purple,
     fontWeight: "600",
+  },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 12,
+    marginBottom: 10,
+    marginLeft: 5,
   },
 });

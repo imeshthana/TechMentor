@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { InputField } from "../../components/inputField";
 import { PrimaryButton } from "../../components/primaryButton";
@@ -16,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { blue, purple } from "../../utils/constants";
+import { useDeleteCourse, useEditCourse } from "../../hooks/useCourseApi";
 
 export const EditCourseScreen = () => {
   const { params } = useRoute();
@@ -27,10 +29,90 @@ export const EditCourseScreen = () => {
   const [courseContentList, setCourseContentList] = useState(
     course.content || []
   );
+  const [errors, setErrors] = useState({
+    title: "",
+    description: "",
+    content: "",
+  });
 
-  const handleAddBlock = () => {
-    setCourseContentList([...courseContentList, ""]);
+  const validateFields = () => {
+    const newErrors = {
+      title: "",
+      description: "",
+      content: "",
+    };
+
+    if (!title.trim()) newErrors.title = "Course title is required";
+    if (!description.trim()) newErrors.description = "Description is required";
+    if (courseContentList.every((item) => item.trim() === ""))
+      newErrors.content = "At least one content block is required";
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error !== "");
   };
+
+  const handleUpdateSuccess = () => {
+    Alert.alert("Success", "Course updated successfully");
+    navigation.navigate("Dashboard");
+  };
+
+  const handleUpdateError = () => {
+    Alert.alert("Error", "Failed to update course");
+  };
+
+  const handleDeleteSuccess = () => {
+    Alert.alert("Deleted", "Course has been deleted");
+    navigation.navigate("Dashboard");
+  };
+
+  const handleDeleteError = () => {
+    Alert.alert("Error", "Failed to delete course");
+  };
+
+  const { mutate: updateCourse, status: updateStatus } = useEditCourse(
+    handleUpdateSuccess,
+    handleUpdateError
+  );
+
+  const { mutate: deleteCourse, status: deleteStatus } = useDeleteCourse(
+    handleDeleteSuccess,
+    handleDeleteError
+  );
+
+  const handleSubmit = () => {
+    if (validateFields()) {
+      const filteredContent = courseContentList.filter(
+        (item) => item.trim() !== ""
+      );
+      updateCourse({
+        courseId: course.id,
+        data: {
+          title,
+          description,
+          content: filteredContent,
+        },
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Course",
+      "Are you sure you want to delete this course?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteCourse({ courseId: course.id });
+          },
+        },
+      ]
+    );
+  };
+
+  const handleAddBlock = () => setCourseContentList([...courseContentList, ""]);
 
   const handleRemoveBlock = (index) => {
     const newList = [...courseContentList];
@@ -44,37 +126,6 @@ export const EditCourseScreen = () => {
     setCourseContentList(newList);
   };
 
-  const handleSubmit = () => {
-    const filteredContent = courseContentList.filter(
-      (item) => item.trim() !== ""
-    );
-    const updatedCourse = {
-      title,
-      description,
-      content: filteredContent,
-    };
-    console.log("Updated Course:", updatedCourse);
-    navigation.goBack(); 
-  };
-
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Course",
-      "Are you sure you want to delete this course?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            console.log("Course Deleted:", course.id);
-            navigation.goBack(); 
-          },
-        },
-      ]
-    );
-  };
-
   return (
     <BackgroundWrapper>
       <SafeAreaView>
@@ -86,15 +137,26 @@ export const EditCourseScreen = () => {
               placeholder="Course Title"
               value={title}
               onChangeText={setTitle}
+              hasError={!!errors.title}
             />
+            {errors.title ? (
+              <Text style={styles.errorText}>{errors.title}</Text>
+            ) : null}
 
             <InputField
               placeholder="Course Description"
               value={description}
               onChangeText={setDescription}
+              hasError={!!errors.description}
             />
+            {errors.description ? (
+              <Text style={styles.errorText}>{errors.description}</Text>
+            ) : null}
 
             <Text style={styles.subHeading}>Course Content</Text>
+            {errors.content ? (
+              <Text style={styles.errorText}>{errors.content}</Text>
+            ) : null}
 
             {courseContentList.map((content, index) => (
               <View key={index} style={styles.contentBlock}>
@@ -123,18 +185,23 @@ export const EditCourseScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <PrimaryButton
-            title="Delete Course"
-            onPress={handleDelete}
-            backgroundColor={blue}
-          />
-          <PrimaryButton title="Submit Changes" onPress={handleSubmit} />
+          {deleteStatus === "loading" || updateStatus === "loading" ? (
+            <ActivityIndicator size="large" color={purple} />
+          ) : (
+            <>
+              <PrimaryButton
+                title="Delete Course"
+                onPress={handleDelete}
+                backgroundColor={blue}
+              />
+              <PrimaryButton title="Submit Changes" onPress={handleSubmit} />
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
     </BackgroundWrapper>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -179,5 +246,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: purple,
     fontWeight: "600",
+  },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 12,
+    marginBottom: 10,
+    marginLeft: 5,
   },
 });

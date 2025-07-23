@@ -1,28 +1,38 @@
 import React, { createContext, useState, useEffect } from "react";
 import SecureStorage from "../services/storageService";
 import ApiClient from "../services/apiService";
+import { useNavigation } from "@react-navigation/native";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigation = useNavigation(AuthContext);
   const [authData, setAuthData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  var isAuthenticated;
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const loadAuthData = async () => {
-    const token = await SecureStorage.get("accessToken");
-    const refreshToken = await SecureStorage.get("refreshToken");
-    const userId = await SecureStorage.get("userId");
-    const userRole = await SecureStorage.get("userRole");
+    try {
+      const token = await SecureStorage.get("accessToken");
+      const refreshToken = await SecureStorage.get("refreshToken");
+      const userId = await SecureStorage.get("userId");
+      const userRole = await SecureStorage.get("userRole");
 
-    if (token && refreshToken) {
-      setAuthData({ userId, userRole });
+      if (token && refreshToken && userId && userRole) {
+        setAuthData({ userId, userRole, token });
+        setIsAuthenticated(true);
+        console.log("Auth data loaded successfully");
+      } else {
+        setIsAuthenticated(false);
+        setAuthData(null);
+      }
+    } catch (error) {
+      console.error("Error loading auth data:", error);
+      setIsAuthenticated(false);
+      setAuthData(null);
+    } finally {
+      setLoading(false);
     }
-
-    isAuthenticated = true;
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -30,19 +40,31 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (token, refreshToken, userId, userRole) => {
-    await SecureStorage.save("accessToken", token);
-    await SecureStorage.save("refreshToken", refreshToken);
-    await SecureStorage.save("userId", userId);
-    await SecureStorage.save("userRole", userRole);
+    try {
+      await SecureStorage.save("accessToken", token);
+      await SecureStorage.save("refreshToken", refreshToken);
+      await SecureStorage.save("userId", userId);
+      await SecureStorage.save("userRole", userRole);
 
-    isAuthenticated = true;
-    setAuthData({ userId, userRole });
+      setAuthData({ userId, userRole, token });
+      setIsAuthenticated(true);
+      console.log("Login successful");
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsAuthenticated(false);
+    }
   };
 
   const logout = async () => {
-    isAuthenticated = false;
-    await SecureStorage.clearAll();
-    setAuthData(null);
+    try {
+      setIsAuthenticated(false);
+      setAuthData(null);
+      await SecureStorage.clearAll();
+      console.log("Logout successful");
+      navigation.navigate("Landing");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   const refreshAuthToken = async () => {
@@ -64,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       return newToken;
     } catch (err) {
       console.error("Refresh failed", err);
-      logout();
+      await logout();
       return null;
     }
   };

@@ -33,8 +33,8 @@ const deleteCourse = async ({ courseId }) => {
   return res.data;
 };
 
-const enrollInCourse = async ({ courseId, data }) => {
-  const res = await apiClient.post(`/course/enroll/${courseId}`, data);
+const enrollInCourse = async ({ courseId, userId }) => {
+  const res = await apiClient.post(`/course/enroll/${courseId}`, {id: userId});
   console.log(res.data);
   return res.data;
 };

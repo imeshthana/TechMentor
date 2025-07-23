@@ -15,7 +15,7 @@ const register = async (data) => {
 };
 
 const fetchProfile = async ({ queryKey }) => {
-  const [_, { userId }] = queryKey;
+  const [_, userId] = queryKey;
   const res = await apiClient.get(`/auth/profile/${userId}`);
   console.log(res.data);
   return res.data;

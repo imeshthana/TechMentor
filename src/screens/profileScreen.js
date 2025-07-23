@@ -23,7 +23,6 @@ export const ProfileScreen = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigation.navigate("Landing");
   };
 
   const handleSuccess = () => {
@@ -43,7 +42,7 @@ export const ProfileScreen = () => {
 
   useEffect(() => {
     if (data) {
-      setProfileData(data);
+      setProfileData(data.user);
     }
   }, [data]);
 
@@ -52,7 +51,7 @@ export const ProfileScreen = () => {
       <SafeAreaView style={styles.container}>
         <Title title={"Profile"} />
 
-        {isLoading ? (
+        {isLoading || !profileData ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color={purple} />
           </View>
@@ -66,7 +65,7 @@ export const ProfileScreen = () => {
 
             <View style={styles.detailContainer}>
               <Text style={styles.label}>Full Name</Text>
-              <Text style={styles.value}>{profileData.fullName}</Text>
+              <Text style={styles.value}>{profileData?.fullname}</Text>
             </View>
 
             <View style={styles.detailContainer}>
@@ -77,11 +76,6 @@ export const ProfileScreen = () => {
             <View style={styles.detailContainer}>
               <Text style={styles.label}>Email</Text>
               <Text style={styles.value}>{profileData.email}</Text>
-            </View>
-
-            <View style={styles.detailContainer}>
-              <Text style={styles.label}>Username</Text>
-              <Text style={styles.value}>{profileData.username}</Text>
             </View>
 
             <PrimaryButton title="Logout" onPress={handleLogout} />

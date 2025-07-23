@@ -1,56 +1,68 @@
-import React from "react";
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import React, { useContext, useState, useEffect } from "react";
+import { StyleSheet, Text, View, FlatList, Alert, ActivityIndicator } from "react-native";
 import { StudentCourseCard } from "../../components/studentCourseCard";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { Title } from "../../components/title";
-
-const courses = [
-  {
-    id: "1",
-    title: "Introduction to Programming",
-    description: "Learn the basics of programming using Python.",
-    instructor: "John Doe",
-  },
-  {
-    id: "2",
-    title: "Advanced Web Development",
-    description: "Master frontend and backend development with modern tools.",
-    instructor: "Jane Smith",
-  },
-  {
-    id: "3",
-    title: "Data Structures & Algorithms",
-    description: "Boost your problem-solving skills with DSA concepts.",
-    instructor: "Emily Johnson",
-  },
-];
+import { AuthContext } from "../../contexts/authContext";
+import { useStudentCourses } from "../../hooks/useStudentApi";
+import { purple } from "../../utils/constants";
 
 export const StudentDashBoardScreen = () => {
+  const { authData } = useContext(AuthContext);
   const navigation = useNavigation();
+  const [courseData, setCourseData] = useState();
+
+  const handleSuccess = () => {
+    console.log("Courses fetched successfully:");
+  };
+
+  const handleError = () => {
+    console.error("Error fetching courses:", error);
+    Alert.alert("Error", "Failed to fetch courses. Please try again later.");
+  };
+
+  const { data, isLoading, isError } = useStudentCourses(
+    authData?.userId,
+    handleSuccess,
+    handleError
+  );
+
+  useEffect(() => {
+    if (data) {
+      setCourseData(data.enrolledCourses);
+    }
+  }, [data]);
 
   const handlePress = (course) => {
     navigation.navigate("SingleCourse", { course });
   };
+
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Title title={"My Courses"} />
-        <FlatList
-          data={courses}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <StudentCourseCard
-              title={item.title}
-              description={item.description}
-              instructor={item.instructor}
-              onPress={() => handlePress(item)}
-            />
-          )}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
+        {isLoading || !courseData ? (
+          <View style={styles.centeredContainer}>
+            <ActivityIndicator size="large" color={purple} />
+          </View>
+        ) : (
+          <FlatList
+            data={courseData}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <StudentCourseCard
+                title={item.title}
+                description={item.description}
+                instructor={item.instructor_name}
+                onPress={() => handlePress(item)}
+              />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </SafeAreaView>
     </BackgroundWrapper>
   );
@@ -61,6 +73,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
     flex: 1,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   listContent: {
     paddingBottom: 16,

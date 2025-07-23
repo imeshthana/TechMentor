@@ -1,14 +1,25 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import React, { useContext, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { useNavigation } from "@react-navigation/native";
+import { PrimaryButton } from "../../components/primaryButton";
+import { purple } from "../../utils/constants";
+import { useEnrollInCourse } from "../../hooks/useCourseApi";
+import { AuthContext } from "../../contexts/authContext";
 
 export const SingleCourseScreen = () => {
   const route = useRoute();
   const { course } = route.params;
-
+  const { authData } = useContext(AuthContext);
   const navigation = useNavigation();
   const parentNavigation = navigation.getParent();
 
@@ -34,12 +45,37 @@ export const SingleCourseScreen = () => {
     };
   }, []);
 
+  const handleSuccess = () => {
+    Alert.alert("Successfull", "You have successfully enrolled to this course");
+  };
+
+  const handleError = () => {
+    console.error("Error enrolling in course:", error);
+    Alert.alert("Error", "There was an error enrolling in the course");
+  };
+
+  const { mutate, status } = useEnrollInCourse(handleSuccess, handleError);
+
+  const handleEnroll = () => {
+    mutate({ courseId: course.id, userId: authData.userId });
+  };
+
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>{course.title}</Text>
-        <Text style={styles.instructor}>Instructor: {course.instructor_name}</Text>
+        <Text style={styles.instructor}>
+          Instructor: {course.instructor_name}
+        </Text>
+        <Text style={styles.sectionTitle}>Description</Text>
+
         <Text style={styles.description}>{course.description}</Text>
+
+        {status === "loading" ? (
+          <ActivityIndicator size="large" color={blue} />
+        ) : (
+          <PrimaryButton title="Enroll Now" onPress={handleEnroll} />
+        )}
 
         {course.content && (
           <>
@@ -81,13 +117,14 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: "#444",
-    marginBottom: 20
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
     marginBottom: 5,
-    color: "#6a11cb",
+    marginTop: 20,
+    color: purple,
   },
   contentItem: {
     paddingVertical: 8,

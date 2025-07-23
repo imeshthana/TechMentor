@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchInstructureCourses } from "../apis/instructureApis";
+import { fetchInstructorCourses } from "../apis/instructorApis";
 
-const useInstructureCourses = (userId, onSuccess, onError) => {
+const useInstructorCourses = (userId, onSuccess, onError) => {
   return useQuery({
-    queryKey: ["instructureCourses", userId],
-    queryFn: fetchInstructureCourses,
+    queryKey: ["instructorCourses", userId],
+    queryFn: fetchInstructorCourses,
     onSuccess: (data) => {
       console.log("Success", data);
       onSuccess(data);
@@ -16,4 +16,4 @@ const useInstructureCourses = (userId, onSuccess, onError) => {
   });
 };
 
-export { useInstructureCourses };
+export { useInstructorCourses };

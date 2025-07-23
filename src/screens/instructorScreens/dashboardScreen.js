@@ -1,72 +1,68 @@
-import React from "react";
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import React , {useContext, useState , useEffect }from "react";
+import { StyleSheet, Text, View, FlatList, ActivityIndicator } from "react-native";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { InstructorCourseCard } from "../../components/instructorCourseCard";
 import { Title } from "../../components/title";
-
-const courses = [
-  {
-    id: "1",
-    title: "Introduction to Programming",
-    description: "Learn the basics of programming using Python.",
-    count: 2,
-    contents: [
-      "dewdew", 'ewxwe'
-    ],
-    students: [
-      { id: "stu001", name: "Alice" },
-      { id: "stu002", name: "Bob" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Advanced Web Development",
-    description: "Master frontend and backend development with modern tools.",
-    count: 2,
-    students: [
-      { id: "stu001", name: "Alice" },
-      { id: "stu002", name: "Bob" },
-    ],
-  },
-  {
-    id: "3",
-    title: "Data Structures & Algorithms",
-    description: "Boost your problem-solving skills with DSA concepts.",
-    count: 2,
-    students: [
-      { id: "stu001", name: "Alice" },
-      { id: "stu002", name: "Bob" },
-    ],
-  },
-];
+import { AuthContext } from "../../contexts/authContext";
+import { useInstructorCourses } from "../../hooks/useInstructorApi";
+import { purple } from "../../utils/constants";
 
 export const InstructorDashboardScreen = () => {
   const navigation = useNavigation();
+  const { authData } = useContext(AuthContext);
+  const [courseData, setCourseData] = useState();
 
-  const handlePress = (course) => {
-    navigation.navigate("SingleCourse", { course });
+  const handlePress = (item) => {
+    navigation.navigate("SingleCourse", { course: item.course, enrolledStudents: item.enrolledStudents });
   };
+
+  const handleSuccess = () => {
+    console.log("Courses fetched successfully:");
+  };
+
+  const handleError = (error) => {
+    console.error("Error fetching courses:", error);
+    Alert.alert("Error", "Failed to fetch courses. Please try again later.");
+  };
+
+  const { data, isLoading, isError } = useInstructorCourses(
+    authData?.userId,
+    handleSuccess,
+    handleError
+  );
+
+  useEffect(() => {
+    if (data) {
+      setCourseData(data.courses);
+    }
+  }, [data]);
 
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Title title={"My Courses"} />
-        <FlatList
-          data={courses}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <InstructorCourseCard
-              title={item.title}
-              description={item.description}
-              count={item.count}
-              onPress={() => handlePress(item)}
-            />
-          )}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
+        {isLoading || !courseData ? (
+          <View style={styles.centeredContainer}>
+            <ActivityIndicator size="large" color={purple} />
+          </View>
+        ) : (
+          <FlatList
+            data={courseData}
+            keyExtractor={(item) => item.course.id}
+            renderItem={({ item }) => (
+              <InstructorCourseCard
+                title={item.course.title}
+                description={item.course.description}
+                count={item.enrolledStudents?.length || 0}
+                onPress={() => handlePress(item)}
+              />
+            )}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
       </SafeAreaView>
     </BackgroundWrapper>
   );
@@ -80,6 +76,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 16,
-    paddingTop: 20
+    paddingTop: 20,
   },
 });

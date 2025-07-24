@@ -24,6 +24,12 @@ export const AuthProvider = ({ children }) => {
       const userRole = await SecureStorage.get("userRole");
 
       if (token && refreshToken && userId && userRole) {
+        if (userRole == "student") {
+          navigation.navigate("StudentBottomTab");
+        } else {
+          navigation.navigate("InstructorBottomTab");
+        }
+
         setAuthData({ userId, userRole });
         setIsAuthenticated(true);
         console.log("Auth data loaded successfully");
@@ -50,6 +56,12 @@ export const AuthProvider = ({ children }) => {
       await SecureStorage.save("refreshToken", refreshToken);
       await SecureStorage.save("userId", userId);
       await SecureStorage.save("userRole", userRole);
+
+      if (userRole == "student") {
+        navigation.navigate("StudentBottomTab");
+      } else {
+        navigation.navigate("InstructorBottomTab");
+      }
 
       setAuthData({ userId, userRole });
       setIsAuthenticated(true);

@@ -68,7 +68,7 @@ export const StudentDashBoardScreen = () => {
         ) : (
           <FlatList
             data={courseData}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <StudentCourseCard
                 title={item?.title}

@@ -16,10 +16,12 @@ import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { purple } from "../../utils/constants";
+import { useNavigation } from "@react-navigation/native";
 import { useAddCourse } from "../../hooks/useCourseApi";
 import { AuthContext } from "../../contexts/authContext";
 
 export const AddCourseScreen = () => {
+  const navigation = useNavigation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [courseContentList, setCourseContentList] = useState([""]);
@@ -46,12 +48,28 @@ export const AddCourseScreen = () => {
     return !Object.values(newErrors).some((error) => error !== "");
   };
 
+   const handleNavigation = () => {
+     navigation.reset({
+       index: 0,
+       routes: [
+         {
+           name: "InstructorBottomTab",
+           state: {
+             index: 0,
+             routes: [{ name: "Dashboard" }],
+           },
+         },
+       ],
+     });
+   };
+
   const handleSuccess = () => {
     Alert.alert("Success", "Course has been added successfully");
     setTitle("");
     setDescription("");
     setCourseContentList([""]);
     setErrors({ title: "", description: "", content: "" });
+    handleNavigation();
   };
 
   const handleError = () => {
@@ -69,7 +87,6 @@ export const AddCourseScreen = () => {
         title,
         description,
         instructor_id: authData?.userId,
-        instructor_name: 'haritha',
         content: filteredContent,
       });
     }

@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect } from "react";
 import SecureStorage from "../services/storageService";
-import ApiClient from "../services/apiService";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setLogoutHandler } from "./authHandler";
 
 export const AuthContext = createContext();
 
@@ -11,6 +12,10 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  useEffect(() => {
+    setLogoutHandler(logout);
+  }, [logout]);
+
   const loadAuthData = async () => {
     try {
       const token = await SecureStorage.get("accessToken");
@@ -19,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       const userRole = await SecureStorage.get("userRole");
 
       if (token && refreshToken && userId && userRole) {
-        setAuthData({ userId, userRole, token });
+        setAuthData({ userId, userRole });
         setIsAuthenticated(true);
         console.log("Auth data loaded successfully");
       } else {
@@ -46,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       await SecureStorage.save("userId", userId);
       await SecureStorage.save("userRole", userRole);
 
-      setAuthData({ userId, userRole, token });
+      setAuthData({ userId, userRole });
       setIsAuthenticated(true);
       console.log("Login successful");
     } catch (error) {
@@ -60,34 +65,16 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
       setAuthData(null);
       await SecureStorage.clearAll();
+      await AsyncStorage.clear();
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Landing" }],
+        });
+      }, 100);
       console.log("Logout successful");
-      navigation.navigate("Landing");
     } catch (error) {
       console.error("Logout error:", error);
-    }
-  };
-
-  const refreshAuthToken = async () => {
-    try {
-      const refreshToken = await SecureStorage.get("refreshToken");
-      const userId = await SecureStorage.get("userId");
-
-      if (!refreshToken || !userId) throw new Error("No refresh credentials");
-
-      const res = await ApiClient.post("/auth/refresh", {
-        id: userId,
-        token: refreshToken,
-      });
-
-      const { token: newToken } = res.data;
-
-      await SecureStorage.save("accessToken", newToken);
-      setAuthData((prev) => ({ ...prev, token: newToken }));
-      return newToken;
-    } catch (err) {
-      console.error("Refresh failed", err);
-      await logout();
-      return null;
     }
   };
 
@@ -97,7 +84,6 @@ export const AuthProvider = ({ children }) => {
         authData,
         login,
         logout,
-        refreshAuthToken,
         loading,
         isAuthenticated,
       }}

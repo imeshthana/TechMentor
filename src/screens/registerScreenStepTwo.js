@@ -88,7 +88,7 @@ export const RegisterScreenStepTwo = () => {
     <BackgroundWrapper>
       <View style={styles.container}>
         <Image
-          source={require("../assets/logo_bg.png")}
+          source={require("../assets/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />

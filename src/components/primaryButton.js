@@ -6,11 +6,13 @@ export const PrimaryButton = ({
   title,
   onPress,
   backgroundColor = purple,
+  disable
 }) => {
   return (
     <TouchableOpacity
       style={[styles.button, { backgroundColor }]}
       onPress={onPress}
+      disabled={disable}
     >
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>

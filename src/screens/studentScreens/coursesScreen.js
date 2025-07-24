@@ -1,4 +1,4 @@
-import React, { use, useState, useEffect } from "react";
+import React, { use, useState, useEffect, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,10 +14,15 @@ import { useNavigation } from "@react-navigation/native";
 import { Title } from "../../components/title";
 import { useFetchCourses } from "../../hooks/useCourseApi";
 import { purple } from "../../utils/constants";
+import { AuthContext } from "../../contexts/authContext";
+import { useStudentCourses } from "../../hooks/useStudentApi";
 
 export const CoursesScreen = () => {
+  const { authData } = useContext(AuthContext);
   const navigation = useNavigation();
   const [courseData, setCourseData] = useState();
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [courses, setCourses] = useState();
 
   const handleSuccess = () => {
     console.log("Courses fetched successfully:");
@@ -30,6 +35,7 @@ export const CoursesScreen = () => {
 
   const handlePress = (course) => {
     navigation.navigate("SingleCourse", { course });
+    console.log(courses);
   };
 
   const { data, isLoading, isError } = useFetchCourses(
@@ -37,23 +43,42 @@ export const CoursesScreen = () => {
     handleError
   );
 
+  const {
+    data: enrolledData,
+    isLoading: isEnrolledLoading,
+    isError: isEnrolledError,
+  } = useStudentCourses(authData?.userId, handleSuccess, handleError);
+
   useEffect(() => {
-    if (data) {
+    if (data && enrolledData) {
       setCourseData(data.courses);
+      setEnrolledCourses(enrolledData.enrolledCourses);
+
+      const enrolledCourseIds = enrolledData.enrolledCourses.map(
+        (course) => course._id
+      );
+      console.log(enrolledCourseIds);
+
+      const updatedCourses = data.courses.map((course) => ({
+        ...course,
+        isEnrolled: enrolledCourseIds.includes(course.id),
+      }));
+
+      setCourses(updatedCourses);
     }
-  }, [data]);
+  }, [data, enrolledData]);
 
   return (
     <BackgroundWrapper>
       <SafeAreaView style={styles.container}>
         <Title title={"Courses"} />
-        {isLoading || !courseData ? (
+        {isLoading || !courses || isEnrolledLoading ? (
           <View style={styles.centeredContainer}>
             <ActivityIndicator size="large" color={purple} />
           </View>
         ) : (
           <FlatList
-            data={courseData}
+            data={courses}
             keyExtractor={(item) => item?.id}
             renderItem={({ item }) => (
               <StudentCourseCard
@@ -61,6 +86,7 @@ export const CoursesScreen = () => {
                 description={item?.description}
                 instructor={item?.instructor_name}
                 onPress={() => handlePress(item)}
+                isEnrolled={item?.isEnrolled}
               />
             )}
             contentContainerStyle={styles.listContent}

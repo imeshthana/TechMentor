@@ -32,6 +32,7 @@ const useRegister = (onSuccess, onError) => {
 const useProfile = (userId, onSuccess, onError) => {
   return useQuery({
     queryKey: ["profile", userId],
+    enabled: !!userId,
     queryFn: fetchProfile,
     onSuccess: (data) => {
       console.log("success", data);

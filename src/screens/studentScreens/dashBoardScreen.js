@@ -1,5 +1,12 @@
 import React, { useContext, useState, useEffect } from "react";
-import { StyleSheet, Text, View, FlatList, Alert, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { StudentCourseCard } from "../../components/studentCourseCard";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,6 +39,13 @@ export const StudentDashBoardScreen = () => {
   useEffect(() => {
     if (data) {
       setCourseData(data.enrolledCourses);
+
+      setCourseData((prevCourses) =>
+        prevCourses.map((course) => ({
+          ...course,
+          isEnrolled: true,
+        }))
+      );
     }
   }, [data]);
 
@@ -47,16 +61,21 @@ export const StudentDashBoardScreen = () => {
           <View style={styles.centeredContainer}>
             <ActivityIndicator size="large" color={purple} />
           </View>
+        ) : courseData.length === 0 ? (
+          <View style={styles.centeredContainer}>
+            <Text>No courses found</Text>
+          </View>
         ) : (
           <FlatList
             data={courseData}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <StudentCourseCard
-                title={item.title}
-                description={item.description}
-                instructor={item.instructor_name}
+                title={item?.title}
+                description={item?.description}
+                instructor={item?.instructor_name}
                 onPress={() => handlePress(item)}
+                isEnrolled={item?.isEnrolled}
               />
             )}
             contentContainerStyle={styles.listContent}

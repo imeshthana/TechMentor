@@ -22,7 +22,20 @@ export const ProfileScreen = () => {
   const [profileData, setProfileData] = useState();
 
   const handleLogout = async () => {
-    await logout();
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+          },
+        },
+      ]
+    );
   };
 
   const handleSuccess = () => {
@@ -85,7 +98,6 @@ export const ProfileScreen = () => {
     </BackgroundWrapper>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

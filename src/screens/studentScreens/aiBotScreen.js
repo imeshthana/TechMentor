@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -8,41 +8,80 @@ import {
   Image,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { lightBlue, lightPurple, purple } from "../../utils/constants";
+import { lightPurple, lightBlue, purple } from "../../utils/constants";
 import { Title } from "../../components/title";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAiSuggestions } from "../../hooks/useAiApi";
+
+const STORAGE_KEY = "ai_chat_messages";
 
 export const AIBotScreen = () => {
-  const [messages, setMessages] = useState([
-    { id: "1", sender: "bot", text: "Hi! How can I assist you today?" },
-  ]);
+  const flatListRef = useRef(null);
+
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
-    if (input.trim() === "") return;
+  useEffect(() => {
+    const loadMessages = async () => {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setMessages(JSON.parse(saved));
+      } else {
+        setMessages([
+          {
+            id: "1",
+            sender: "bot",
+            text: "Hi! Tell me your interests to suggest courses for you.",
+          },
+        ]);
+      }
+    };
+    loadMessages();
+  }, []);
 
-    const newMessage = {
+  const saveMessages = async (updatedMessages) => {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMessages));
+  };
+
+  const handleSuccess = (data) => {
+    const botMessage = {
+      id: (Date.now() + 1).toString(),
+      sender: "bot",
+      text: data.recommendations,
+    };
+    const updated = [...messages, botMessage];
+    setMessages(updated);
+    saveMessages(updated);
+    flatListRef.current?.scrollToEnd({ animated: true });
+  };
+
+  const handleError = (error) => {
+    console.error("AI error:", error);
+    Alert.alert("Error", "Something went wrong. Please try again.");
+  };
+
+  const { mutate, isLoading } = useAiSuggestions(handleSuccess, handleError);
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+
+    const userMessage = {
       id: Date.now().toString(),
       sender: "user",
-      text: input,
+      text: input.trim(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    const updated = [...messages, userMessage];
+    setMessages(updated);
+    saveMessages(updated);
+    flatListRef.current?.scrollToEnd({ animated: true });
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: "bot",
-          text: "That's interesting! Tell me more.",
-        },
-      ]);
-    }, 800);
-
+    mutate({ prompt: input.trim() });
     setInput("");
   };
 
@@ -62,22 +101,26 @@ export const AIBotScreen = () => {
       <SafeAreaView style={styles.container}>
         <KeyboardAvoidingView
           style={styles.keyboardAvoidingView}
-          behavior= "height"
-          keyboardVerticalOffset= {10}
+          behavior="height"
+          keyboardVerticalOffset={10}
         >
-          <Title title={"AI Assistant"}/>
+          <Title title={"AI Assistant"} />
 
           <Image
-            source={require("../../assets/logo_bg.png")}
+            source={require("../../assets/logo.png")}
             style={styles.logo}
           />
 
           <FlatList
+            ref={flatListRef}
             data={messages}
             keyExtractor={(item) => item.id}
             renderItem={renderMessage}
             contentContainerStyle={styles.chatContainer}
             style={styles.messagesList}
+            onContentSizeChange={() =>
+              flatListRef.current?.scrollToEnd({ animated: true })
+            }
           />
 
           <View style={styles.inputContainer}>
@@ -87,8 +130,16 @@ export const AIBotScreen = () => {
               onChangeText={setInput}
               style={styles.input}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-              <Text style={styles.sendText}>Send</Text>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={handleSend}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.sendText}>Send</Text>
+              )}
             </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
@@ -145,7 +196,7 @@ const styles = StyleSheet.create({
     height: 45,
     marginRight: 10,
     borderColor: purple,
-    borderWidth: 1
+    borderWidth: 1,
   },
   sendButton: {
     backgroundColor: purple,

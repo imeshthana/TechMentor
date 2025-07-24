@@ -2,12 +2,15 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { blue, purple } from "../utils/constants";
 
-export const StudentCourseCard = ({ title, description, instructor, onPress }) => {
+export const StudentCourseCard = ({ title, description, instructor, onPress, isEnrolled }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Text style={styles.courseTitle}>{title}</Text>
+      <Text style={styles.courseTitle }>{title}</Text>
       <Text style={styles.description}>{description}</Text>
       <Text style={styles.instructor}>Instructor: {instructor}</Text>
+      {
+        isEnrolled && <Text style={styles.enrollmentStatus}>Enrolled</Text>
+      }
     </TouchableOpacity>
   );
 };
@@ -35,5 +38,13 @@ const styles = StyleSheet.create({
   instructor: {
     fontSize: 13,
     color: "#888",
+  },
+  enrollmentStatus: {
+    fontSize: 12,
+    color: blue,
+    marginTop: 4,
+    position: "absolute",
+    bottom: 20,
+    right: 20
   },
 });

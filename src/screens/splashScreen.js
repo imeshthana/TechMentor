@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
 import { BackgroundWrapper } from "../components/backgroundWrapper";
 import { useNavigation } from "@react-navigation/native";
@@ -10,7 +10,6 @@ export const SplashScreen = () => {
     setTimeout(() => {
       navigation.replace("Landing");
     }, 3000);
-
   }, [navigation]);
 
   return (
@@ -36,7 +35,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    
   },
   logo: {
     width: 150,

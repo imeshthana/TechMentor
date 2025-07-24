@@ -53,8 +53,23 @@ export const EditCourseScreen = () => {
 
   const handleUpdateSuccess = () => {
     Alert.alert("Success", "Course updated successfully");
-    navigation.navigate("Dashboard");
+    handleNavigation();
   };
+
+  const handleNavigation = () => {
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "InstructorBottomTab",
+          state: {
+            index: 0,
+            routes: [{ name: "Dashboard" }],
+          },
+        },
+      ],
+    });
+  }
 
   const handleUpdateError = () => {
     Alert.alert("Error", "Failed to update course");
@@ -62,7 +77,7 @@ export const EditCourseScreen = () => {
 
   const handleDeleteSuccess = () => {
     Alert.alert("Deleted", "Course has been deleted");
-    navigation.navigate("Dashboard");
+    handleNavigation();
   };
 
   const handleDeleteError = () => {
@@ -194,7 +209,7 @@ export const EditCourseScreen = () => {
                 onPress={handleDelete}
                 backgroundColor={blue}
               />
-              <PrimaryButton title="Submit Changes" onPress={handleSubmit} />
+              <PrimaryButton title="Save Changes" onPress={handleSubmit} />
             </>
           )}
         </ScrollView>

@@ -4,7 +4,7 @@
     "slug": "TechMentor",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -16,13 +16,20 @@
     "android": {
       "package": "com.techmentor",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "resizeMode": "native",
+        "foregroundImage": "./src/assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "enableHermes": true,
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3eb35ad9-c0a2-4c90-b975-edbc61a90ea7"
+      }
     }
   }
 }

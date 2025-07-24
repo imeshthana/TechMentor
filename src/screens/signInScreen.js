@@ -64,7 +64,7 @@ export const SignInScreen = () => {
     <BackgroundWrapper>
       <View style={styles.container}>
         <Image
-          source={require("../assets/logo_bg.png")}
+          source={require("../assets/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -118,10 +118,10 @@ export const SignInScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 40,
-    justifyContent:"center",
+    justifyContent: "center",
   },
   logo: {
     width: "100%",

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { useNavigation } from "@react-navigation/native";
 import { PrimaryButton } from "../../components/primaryButton";
-import { purple } from "../../utils/constants";
+import { blue, purple } from "../../utils/constants";
 import { useEnrollInCourse } from "../../hooks/useCourseApi";
 import { AuthContext } from "../../contexts/authContext";
 
@@ -22,6 +22,22 @@ export const SingleCourseScreen = () => {
   const { authData } = useContext(AuthContext);
   const navigation = useNavigation();
   const parentNavigation = navigation.getParent();
+  const [enroll, setEnroll] = useState(false);
+
+  const handleNavigation = () => {
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: "StudentBottomTab",
+          state: {
+            index: 0,
+            routes: [{ name: "Dashboard" }],
+          },
+        },
+      ],
+    });
+  };
 
   useEffect(() => {
     parentNavigation?.setOptions({
@@ -45,8 +61,16 @@ export const SingleCourseScreen = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (course.isEnrolled) {
+      setEnroll(true);
+    }
+  }, [course]);
+
   const handleSuccess = () => {
     Alert.alert("Successfull", "You have successfully enrolled to this course");
+    handleNavigation();
+    setEnroll(true);
   };
 
   const handleError = () => {
@@ -74,12 +98,17 @@ export const SingleCourseScreen = () => {
         {status === "loading" ? (
           <ActivityIndicator size="large" color={blue} />
         ) : (
-          <PrimaryButton title="Enroll Now" onPress={handleEnroll} />
+          <PrimaryButton
+            title={enroll ? "Already Enrolled" : "Enroll Now"}
+            onPress={handleEnroll}
+            disable={enroll ? true : false}
+            backgroundColor={enroll ? blue : purple }
+          />
         )}
 
         {course.content && (
           <>
-            <Text style={styles.sectionTitle}>Course Content:</Text>
+            <Text style={styles.sectionTitle}>Course Content</Text>
             <FlatList
               data={course.content}
               keyExtractor={(item, index) => index.toString()}

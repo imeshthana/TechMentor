@@ -1,5 +1,12 @@
-import React , {useContext, useState , useEffect }from "react";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator } from "react-native";
+import React, { useContext, useState, useEffect, useCallback } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { BackgroundWrapper } from "../../components/backgroundWrapper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
@@ -14,8 +21,17 @@ export const InstructorDashboardScreen = () => {
   const { authData } = useContext(AuthContext);
   const [courseData, setCourseData] = useState();
 
+   useFocusEffect(
+     useCallback(() => {
+       refetch(); 
+     }, [refetch])
+   );
+
   const handlePress = (item) => {
-    navigation.navigate("SingleCourse", { course: item.course, enrolledStudents: item.enrolledStudents });
+    navigation.navigate("SingleCourse", {
+      course: item.course,
+      enrolledStudents: item.enrolledStudents,
+    });
   };
 
   const handleSuccess = () => {
@@ -27,7 +43,7 @@ export const InstructorDashboardScreen = () => {
     Alert.alert("Error", "Failed to fetch courses. Please try again later.");
   };
 
-  const { data, isLoading, isError } = useInstructorCourses(
+  const { data, isLoading, isError, refetch } = useInstructorCourses(
     authData?.userId,
     handleSuccess,
     handleError
@@ -46,6 +62,10 @@ export const InstructorDashboardScreen = () => {
         {isLoading || !courseData ? (
           <View style={styles.centeredContainer}>
             <ActivityIndicator size="large" color={purple} />
+          </View>
+        ) : courseData.length == 0 ? (
+          <View style={styles.centeredContainer}>
+            <Text>No courses found</Text>
           </View>
         ) : (
           <FlatList
@@ -73,6 +93,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
     flex: 1,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   listContent: {
     paddingBottom: 16,

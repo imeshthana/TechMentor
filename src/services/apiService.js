@@ -2,8 +2,7 @@ import axios from "axios";
 import { baseUrl } from "../utils/baseUrl";
 import { Alert } from "react-native";
 import SecureStorage from "./storageService";
-import { AuthContext } from "../contexts/authContext";
-import { useNavigation } from "@react-navigation/native";
+import { triggerLogout } from "../contexts/authHandler";
 
 const ApiClient = axios.create({
   baseURL: baseUrl,
@@ -44,6 +43,10 @@ ApiClient.interceptors.response.use(
         const refreshToken = await SecureStorage.get("refreshToken");
         const userId = await SecureStorage.get("userId");
 
+        if (!refreshToken || !userId) {
+          return Promise.reject(error);
+        }
+
         const res = await axios.post(`${baseUrl}/auth/refresh`, {
           id: userId,
           token: refreshToken,
@@ -57,7 +60,7 @@ ApiClient.interceptors.response.use(
       } catch (err) {
         console.error("Token refresh failed:", err);
         await SecureStorage.clearAll();
-        AuthContext.logout();
+        await triggerLogout();
         Alert.alert("Session Expired", "Please log in again.");
         return Promise.reject(err);
       }
